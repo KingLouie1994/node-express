@@ -5,20 +5,20 @@ const bodyParser = require("body-parser");
 
 const app = express();
 
+const errorController = require("./controllers/error");
+
 app.set("view engine", "ejs");
 app.set("views", "views");
 
-const adminData = require("./routes/admin");
+const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/admin", adminData.router);
+app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
-app.use("/", (req, res, next) => {
-  res.render("404", { pageTitle: "Error 404", path: "/404" });
-});
+app.use("/", errorController.getError);
 
 app.listen(3000);
