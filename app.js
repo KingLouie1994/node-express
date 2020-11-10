@@ -5,7 +5,6 @@ const bodyParser = require("body-parser");
 
 const errorController = require("./controllers/error");
 const sequelize = require("./util/database");
-
 const Product = require("./models/product");
 const User = require("./models/user");
 const Cart = require("./models/cart");
@@ -57,7 +56,7 @@ sequelize
   })
   .then((user) => {
     if (!user) {
-      return User.create({ name: "Luis", email: "test@test.com" });
+      return User.create({ name: "Max", email: "test@test.com" });
     }
     return user;
   })
