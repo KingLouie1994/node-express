@@ -1,9 +1,11 @@
 const mongodb = require("mongodb");
 const MongoClient = mongodb.MongoClient;
 
+let _db;
+
 const mongoConnect = (callback) => {
   MongoClient.connect(
-    "mongodb+srv://Node-Complete-Guide2020:Node-Complete-Guide2020@node-complete-guide.sj1wi.mongodb.net/<dbname>?retryWrites=true&w=majority",
+    "mongodb+srv://Node-Complete-Guide2020:Node-Complete-Guide2020@node-complete-guide.sj1wi.mongodb.net/shop?retryWrites=true&w=majority",
     {
       useUnifiedTopology: true,
       useNewUrlParser: true,
@@ -11,11 +13,21 @@ const mongoConnect = (callback) => {
   )
     .then((client) => {
       console.log("Successfully connected to MongoDB");
-      callback(client);
+      _db = client.db();
+      callback();
     })
     .catch((err) => {
       console.log(err);
+      throw err;
     });
 };
 
-module.exports = mongoConnect;
+const getDb = () => {
+  if (_db) {
+    return _db;
+  }
+  throw "No database found!";
+};
+
+exports.mongoConnect = mongoConnect;
+exports.getDb = getDb;
