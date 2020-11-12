@@ -2,6 +2,17 @@ const bcrypt = require("bcryptjs");
 
 const User = require("../models/user");
 
+const nodemailer = require("nodemailer");
+const sendgridTransport = require("nodemailer-sendgrid-transport");
+
+const transporter = nodemailer.createTransport(
+  sendgridTransport({
+    auth: {
+      api_key: "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",
+    },
+  })
+);
+
 exports.getLogin = (req, res, next) => {
   let message = req.flash("error");
   if (message.length > 0) {
