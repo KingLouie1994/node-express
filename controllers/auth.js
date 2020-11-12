@@ -93,13 +93,15 @@ exports.postSignup = (req, res, next) => {
           return user.save();
         })
         .then((result) => {
-          res.redirect("/login");
           return transporter.sendMail({
             to: email,
-            from: "noreply@sdl.com",
+            from: "lschekerka@yahoo.de",
             subject: "Signup succeeded!",
             html: "<h1>You successfully signed up!</h1>",
           });
+        })
+        .then((result) => {
+          res.redirect("/login");
         })
         .catch((err) => {
           console.log(err);
