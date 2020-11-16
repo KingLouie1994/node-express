@@ -8,9 +8,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const sgMail = require("@sendgrid/mail");
-sgMail.setApiKey(
-  process.env.SENDGRID_API_KEY
-);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash("error");
@@ -152,14 +150,33 @@ exports.postReset = (req, res, next) => {
     User.findOne({ email: req.body.email })
       .then((user) => {
         if (!user) {
-          req.flash("error", "No account with that email found!");
+          req.flash("error", "No Account with that email found!");
           return res.redirect("/reset");
         }
         user.resetToken = token;
         user.resetTokenExpiration = Date.now() + 3600000;
         return user.save();
       })
-      .then((result) => {})
+      .then((result) => {
+        const msg = {
+          to: req.body.email,
+          from: "luis.schekerka@gmail.com",
+          subject: "Password Reset",
+          html: `
+          <p>You requestet a password reset!</p>
+          <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> within the next hour to create a new password!</p>
+          `,
+        };
+        sgMail
+          .send(msg)
+          .then(() => {
+            res.redirect("/");
+            console.log("Email sent");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      })
       .catch((err) => {
         console.log(err);
       });
