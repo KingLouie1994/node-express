@@ -84,47 +84,37 @@ exports.postSignup = (req, res, next) => {
       errorMessage: errors.array()[0].msg,
     });
   }
-  User.findOne({ email: email })
-    .then((userDoc) => {
-      if (userDoc) {
-        req.flash("error", "Email already exists");
-        return res.redirect("/signup");
-      }
-      return bcrypt
-        .hash(password, 12)
-        .then((hashedPassword) => {
-          const user = new User({
-            email: email,
-            password: hashedPassword,
-            cart: { items: [] },
-          });
-          return user.save();
+  bcrypt
+    .hash(password, 12)
+    .then((hashedPassword) => {
+      const user = new User({
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+      return user.save();
+    })
+    .then((result) => {
+      const msg = {
+        to: email,
+        from: "luis.schekerka@gmail.com",
+        subject: "Sending with SendGrid is Fun",
+        text: "and easy to do anywhere, even with Node.js",
+        html: "<strong>and easy to do anywhere, even with Node.js</strong>",
+      };
+      sgMail
+        .send(msg)
+        .then(() => {
+          console.log("Email sent");
         })
-        .then((result) => {
-          const msg = {
-            to: email,
-            from: "luis.schekerka@gmail.com",
-            subject: "Sending with SendGrid is Fun",
-            text: "and easy to do anywhere, even with Node.js",
-            html: "<strong>and easy to do anywhere, even with Node.js</strong>",
-          };
-          sgMail
-            .send(msg)
-            .then(() => {
-              console.log("Email sent");
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        })
-        .then((result) => {
-          console.log("User safed!");
-          console.log(`Sent to ${email}`);
-          res.redirect("/login");
-        })
-        .catch((err) => {
-          console.log(err);
+        .catch((error) => {
+          console.error(error);
         });
+    })
+    .then((result) => {
+      console.log("User safed!");
+      console.log(`Sent to ${email}`);
+      res.redirect("/login");
     })
     .catch((err) => {
       console.log(err);
