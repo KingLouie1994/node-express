@@ -8,7 +8,9 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const sgMail = require("@sendgrid/mail");
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+sgMail.setApiKey(
+  process.env.SENDGRID_API_KEY
+);
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash("error");
