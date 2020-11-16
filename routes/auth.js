@@ -10,7 +10,16 @@ router.get("/login", authController.getLogin);
 
 router.get("/signup", authController.getSignup);
 
-router.post("/login", authController.postLogin);
+router.post(
+  "/login",
+  [
+    body("email", "Please enter a valid e-mail adress.").isEmail(),
+    body("password", "Password has to be valid")
+      .isLength({ min: 5 })
+      .isAlphanumeric(),
+  ],
+  authController.postLogin
+);
 
 router.post(
   "/signup",
@@ -27,13 +36,14 @@ router.post(
           if (userDoc) {
             return Promise.reject("Email already exists");
           }
+          return true;
         });
       }),
     body(
       "password",
       "Please enter a password with only numbers and text with at least 5 characters!"
     )
-      .isLength({ min: 5, max: 255 })
+      .isLength({ min: 5 })
       .isAlphanumeric(),
     body("confirmPassword").custom((value, { req }) => {
       if (value !== req.body.password) {
