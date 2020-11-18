@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
+const PDFDocument = require("pdfkit");
+
 const Product = require("../models/product");
 const Order = require("../models/order");
 
@@ -125,13 +127,28 @@ exports.getInvoice = (req, res, next) => {
   Order.findById(orderId)
     .then((order) => {
       if (!order) {
-        throw next(new Error("No order found"));
+        // throw next(new Error("No order found"));
+        return console.log("test1");
       }
-      if (order.user.userId.toString() === req.user._id.toString()) {
-        return next(new Error("Unauthorized"));
+      if (order.user.userId.toString() !== req.user._id.toString()) {
+        // return next(new Error("Unauthorized"));
+        return console.log("test2");
       }
       const invoiceName = "invoice-" + orderId + ".pdf";
       const invoicePath = path.join("invoices", invoiceName);
+
+      const pdfDoc = new PDFDocument();
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        'inline; filename="' + invoiceName + '"'
+      );
+      pdfDoc.pipe(fs.createWriteStream(invoicePath));
+      pdfDoc.pipe(res);
+
+      pdfDoc.fontSize(26).text("Invoice");
+
+      pdfDoc.end();
       // fs.readFile(invoicePath, (err, data) => {
       //   if (err) {
       //     return next(err);
@@ -143,15 +160,16 @@ exports.getInvoice = (req, res, next) => {
       //   );
       //   res.send(data);
       // });
-      const file = fs.createReadStream(invoicePath);
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader(
-        "Content-Disposition",
-        'attachment; filename="' + invoiceName + '"'
-      );
-      file.pipe(res);
+
+      // const file = fs.createReadStream(invoicePath);
+      // res.setHeader("Content-Type", "application/pdf");
+      // res.setHeader(
+      //   "Content-Disposition",
+      //   'attachment; filename="' + invoiceName + '"'
+      // );
+      // file.pipe(res);
     })
     .catch((err) => {
-      next(err);
+      console.log("test3");
     });
 };
