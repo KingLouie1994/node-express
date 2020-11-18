@@ -127,12 +127,10 @@ exports.getInvoice = (req, res, next) => {
   Order.findById(orderId)
     .then((order) => {
       if (!order) {
-        // throw next(new Error("No order found"));
-        return console.log("test1");
+        throw next(new Error("No order found"));
       }
       if (order.user.userId.toString() !== req.user._id.toString()) {
-        // return next(new Error("Unauthorized"));
-        return console.log("test2");
+        return next(new Error("Unauthorized"));
       }
       const invoiceName = "invoice-" + orderId + ".pdf";
       const invoicePath = path.join("invoices", invoiceName);
