@@ -13,10 +13,11 @@ router.get("/signup", authController.getSignup);
 router.post(
   "/login",
   [
-    body("email", "Please enter a valid e-mail adress.")
+    body("email")
       .isEmail()
+      .withMessage("Please enter a valid email address.")
       .normalizeEmail(),
-    body("password", "Password has to be valid")
+    body("password", "Password has to be valid.")
       .isLength({ min: 5 })
       .isAlphanumeric()
       .trim(),
@@ -29,23 +30,24 @@ router.post(
   [
     check("email")
       .isEmail()
-      .withMessage("Please enter a valid e-mail adress.")
+      .withMessage("Please enter a valid email.")
       .custom((value, { req }) => {
-        // if (value === "test@test.com") {
-        //   throw new Error("This email adress is forbidden!");
+        // if (value === 'test@test.com') {
+        //   throw new Error('This email address if forbidden.');
         // }
         // return true;
         return User.findOne({ email: value }).then((userDoc) => {
           if (userDoc) {
-            return Promise.reject("Email already exists");
+            return Promise.reject(
+              "E-Mail exists already, please pick a different one."
+            );
           }
-          return true;
         });
       })
       .normalizeEmail(),
     body(
       "password",
-      "Please enter a password with only numbers and text with at least 5 characters!"
+      "Please enter a password with only numbers and text and at least 5 characters."
     )
       .isLength({ min: 5 })
       .isAlphanumeric()
